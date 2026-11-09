@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KING_YOSEF_ · Password Strength Checker</title>
+  <!-- Font Awesome for crisp vector icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ---------- Global reset & KING_YOSEF_ style ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0d1117; /* Darker, cleaner background like the screenshot */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .card {
+      background: #161b22;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.2);
+      padding: 2.5rem;
+      max-width: 650px;
+      width: 100%;
+      border: 1px solid #30363d;
+    }
+
+    /* KING_YOSEF_ signature & headers */
+    .king-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Fixed Lock Icon Styling */
+    .brand-title i {
+      font-size: 1.8rem;
+      color: #d4af37; /* Solid gold color */
+      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.3));
+    }
+
+    .brand-title h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #e6edf3;
+    }
+
+    .brand-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.1);
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      letter-spacing: 1px;
+    }
+
+    /* Password input group */
+    .input-group {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .input-group .fa-lock {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8b949e;
+      font-size: 1.2rem;
+      pointer-events: none;
+    }
+
+    .password-field {
+      width: 100%;
+      padding: 1.1rem 3.5rem 1.1rem 3.5rem;
+      border-radius: 50px;
+      background: #0d1117;
+      border: 1.5px solid #30363d;
+      font-size: 1rem;
+      color: #e6edf3;
+      letter-spacing: 1px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .password-field:focus {
+      border-color: #d4af37;
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    }
+
+    /* Toggle visibility button */
+    .toggle-visibility {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #8b949e;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 5px;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-visibility:hover {
+      color: #d4af37;
+    }
+
+    /* Strength meter & progress */
+    .strength-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.6rem;
+    }
+
+    .strength-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      color: #8b949e;
+    }
+
+    .strength-verdict {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #f39c12; /* Default medium color */
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      background: #21262d;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.3s ease, background 0.3s;
+      background: #e74c3c;
+    }
+
+    /* Criteria list */
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 1.5rem;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .criteria-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: #8b949e;
+      transition: color 0.2s;
+    }
+
+    .criteria-item i {
+      width: 18px;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #30363d;
+      transition: all 0.2s;
+    }
+
+    .criteria-item.met {
+      color: #e6edf3;
+    }
+
+    .criteria-item.met i {
+      color: #2ecc71;
+    }
+
+    /* KING_YOSEF_ footer */
+    .king-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #30363d;
+      color: #8b949e;
+      font-size: 0.85rem;
+    }
+
+    .king-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.05);
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .king-tag i {
+      font-size: 0.9rem;
+    }
+
+    /* Additional details */
+    .entropy-info {
+      font-size: 0.85rem;
+      color: #8b949e;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      padding: 0 0.2rem;
+    }
+
+    .entropy-info span i {
+      margin-right: 6px;
+      color: #d4af37;
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .card {
+        padding: 1.5rem;
+      }
+      .brand-title h1 {
+        font-size: 1.3rem;
+      }
+      .brand-title i {
+        font-size: 1.5rem;
+      }
+      .brand-badge {
+        display: none; /* Hide badge on small screens to save space */
+      }
+      .criteria-grid {
+        grid-template-columns: 1fr;
+      }
+      .password-field {
+        font-size: 0.95rem;
+        padding: 1rem 3rem 1rem 3rem;
+      }
+      .input-group .fa-lock {
+        left: 15px;
+      }
+      .toggle-visibility {
+        right: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- KING_YOSEF_ header with fixed lock icon -->
+    <div class="king-brand">
+      <div class="brand-title">
+        <i class="fas fa-lock"></i>
+        <h1>KING_YOSEF_</h1>
+      </div>
+      <span class="brand-badge">PASSWORD STRENGTH</span>
+    </div>
+
+    <!-- Password input -->
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="passwordInput" class="password-field" placeholder="Enter your password" autocomplete="off" spellcheck="false">
+      <button class="toggle-visibility" id="toggleBtn" type="button" aria-label="Show password">
+        <i class="fas fa-eye-slash" id="eyeIcon"></i>
+      </button>
+    </div>
+
+    <!-- Strength meter & verdict -->
+    <div class="strength-header">
+      <span class="strength-label">STRENGTH</span>
+      <span class="strength-verdict" id="strengthLabel">—</span>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Live criteria (checked / unchecked) -->
+    <div class="criteria-grid" id="criteriaGrid">
+      <div class="criteria-item" id="criteria-length">
+        <i class="far fa-circle"></i> <span>8+ characters</span>
+      </div>
+      <div class="criteria-item" id="criteria-uppercase">
+        <i class="far fa-circle"></i> <span>Uppercase letter</span>
+      </div>
+      <div class="criteria-item" id="criteria-lowercase">
+        <i class="far fa-circle"></i> <span>Lowercase letter</span>
+      </div>
+      <div class="criteria-item" id="criteria-number">
+        <i class="far fa-circle"></i> <span>Number</span>
+      </div>
+      <div class="criteria-item" id="criteria-special">
+        <i class="far fa-circle"></i> <span>Special character</span>
+      </div>
+      <div class="criteria-item" id="criteria-repeat">
+        <i class="far fa-circle"></i> <span>No repeated chars</span>
+      </div>
+    </div>
+
+    <!-- Extra entropy info -->
+    <div class="entropy-info">
+      <span><i class="fas fa-key"></i> Entropy: <span id="entropyBits">0</span> bits</span>
+      <span><i class="fas fa-shield-alt"></i> Score: <span id="scoreDisplay">0</span>/100</span>
+    </div>
+
+    <!-- KING_YOSEF_ footer -->
+    <div class="king-footer">
+      <span>© KING_YOSEF_</span>
+      <span class="king-tag"><i class="fas fa-lock"></i> SECURE</span>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // DOM elements
+      const passwordInput = document.getElementById('passwordInput');
+      const toggleBtn = document.getElementById('toggleBtn');
+      const eyeIcon = document.getElementById('eyeIcon');
+      const progressBar = document.getElementById('progressBar');
+      const strengthLabel = document.getElementById('strengthLabel');
+      const entropyBitsSpan = document.getElementById('entropyBits');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+
+      // Criteria elements
+      const criteriaLength = document.getElementById('criteria-length');
+      const criteriaUppercase = document.getElementById('criteria-uppercase');
+      const criteriaLowercase = document.getElementById('criteria-lowercase');
+      const criteriaNumber = document.getElementById('criteria-number');
+      const criteriaSpecial = document.getElementById('criteria-special');
+      const criteriaRepeat = document.getElementById('criteria-repeat');
+
+      // Helper: set criteria state (checked / unchecked)
+      function setCriterion(element, isMet) {
+        const icon = element.querySelector('i');
+        if (isMet) {
+          element.classList.add('met');
+          icon.classList.remove('far', 'fa-circle');
+          icon.classList.add('fas', 'fa-check-circle');
+        } else {
+          element.classList.remove('met');
+          icon.classList.remove('fas', 'fa-check-circle');
+          icon.classList.add('far', 'fa-circle');
+        }
+      }
+
+      // Core strength calculation
+      function evaluatePassword(pwd) {
+        if (!pwd) pwd = '';
+
+        // 1. Criteria checks
+        const hasLength = pwd.length >= 8;
+        const hasUppercase = /[A-Z]/.test(pwd);
+        const hasLowercase = /[a-z]/.test(pwd);
+        const hasNumber = /[0-9]/.test(pwd);
+        const hasSpecial = /[^A-Za-z0-9]/.test(pwd); 
+        const noRepeats = !(/(.)\1/.test(pwd)); 
+
+        // Update criteria UI
+        setCriterion(criteriaLength, hasLength);
+        setCriterion(criteriaUppercase, hasUppercase);
+        setCriterion(criteriaLowercase, hasLowercase);
+        setCriterion(criteriaNumber, hasNumber);
+        setCriterion(criteriaSpecial, hasSpecial);
+        setCriterion(criteriaRepeat, noRepeats);
+
+        // 2. Compute base score (0-100)
+        let score = 0;
+        if (pwd.length > 0) {
+          const lengthScore = Math.min(pwd.length * 2.5, 30);
+          const upperScore = hasUppercase ? 10 : 0;
+          const lowerScore = hasLowercase ? 10 : 0;
+          const numberScore = hasNumber ? 15 : 0;
+          const specialScore = hasSpecial ? 20 : 0;
+          const repeatBonus = noRepeats ? 15 : 0;
+          
+          score = lengthScore + upperScore + lowerScore + numberScore + specialScore + repeatBonus;
+          score = Math.min(Math.round(score), 100);
+        }
+
+        // 3. Entropy estimation
+        let entropy = 0;
+        if (pwd.length > 0) {
+          let poolSize = 0;
+          if (hasLowercase) poolSize += 26;
+          if (hasUppercase) poolSize += 26;
+          if (hasNumber) poolSize += 10;
+          if (hasSpecial) poolSize += 33;
+          if (poolSize === 0) poolSize = 1;
+          entropy = Math.round(pwd.length * Math.log2(poolSize));
+        }
+
+        // 4. Map score to strength label & color
+        let strengthText = '—';
+        let barColor = '#e74c3c';
+        let barWidth = score + '%';
+
+        if (pwd.length === 0) {
+          strengthText = '—';
+          barWidth = '0%';
+          barColor = '#30363d';
+        } else if (score < 30) {
+          strengthText = 'WEAK';
+          barColor = '#e74c3c'; // Red
+        } else if (score < 60) {
+          strengthText = 'MEDIUM';
+          barColor = '#f39c12'; // Orange
+        } else if (score < 85) {
+          strengthText = 'STRONG';
+          barColor = '#3498db'; // Blue
+        } else {
+          strengthText = 'VERY STRONG';
+          barColor = '#2ecc71'; // Green
+        }
+
+        // Update UI elements
+        strengthLabel.textContent = strengthText;
+        strengthLabel.style.color = barColor;
+        progressBar.style.width = barWidth;
+        progressBar.style.backgroundColor = barColor;
+        entropyBitsSpan.textContent = entropy;
+        scoreDisplay.textContent = score;
+
+        if (pwd.length === 0) {
+          strengthLabel.style.color = '#8b949e';
+        }
+      }
+
+      // Toggle password visibility
+      toggleBtn.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        if (type === 'password') {
+          eyeIcon.classList.remove('fa-eye');
+          eyeIcon.classList.add('fa-eye-slash');
+        } else {
+          eyeIcon.classList.remove('fa-eye-slash');
+          eyeIcon.classList.add('fa-eye');
+        }
+      });
+
+      // Real-time input listener
+      passwordInput.addEventListener('input', function(e) {
+        evaluatePassword(e.target.value);
+      });
+
+      // Initial evaluation
+      evaluatePassword('');
+    })();
+  </script>
+</body>
+</html>
